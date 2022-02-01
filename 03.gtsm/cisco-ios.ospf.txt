@@ -1,0 +1,3 @@
+! konfiguracja procesu OSPF - aktywujemy GTSM na wszystkich interfejsach
+router ospf 65400
+ ttl-security all-interfaces

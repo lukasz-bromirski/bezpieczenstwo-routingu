@@ -1,0 +1,28 @@
+! konfiguracja opisująca jaki ruch chcemy poddać ograniczeniom
+! w naszym przypadku blokujemy ruch TCP i UDP do adresu 100.100.3.116 na adresy portów 20-22 oraz
+! dowolny ruch ICMP poddajemy ograniczeniu do 8000 bitów na sekundę (uwaga - ograniczenia te nakładane
+! będą niezależnie na każdym routerze brzegowym, w naszym przypadku może to oznaczać przy idealnie rozkładającym
+! się ruchu wchodzącym do AS, że 100.100.3.116 może otrzymać do 16000 bitów ICMP na sekundę)
+class-map type traffic match-all DNS-BGLR-BLOCK-MGMNT
+ match protocol tcp
+ match destination-address ipv4 100.100.3.116/32
+ match destination-port range 20-22
+!
+class-map type traffic match-all DNS-BGLR-LIMIT-ICMP
+ match destination-address ipv4 100.100.3.116/32
+ match protocol icmp
+!
+policy-map type pbr FSPEC-BGLR-GLOBAL
+ class type traffic DNS-BGLR-BLOCK-MGMNT
+  drop ! ten ruch odrzucamy
+ class type traffic DNS-BGLR-LIMIT-ICMP
+  police rate 8000 ! ten ruch poddajemy ograniczeniu pasma 
+!
+flowspec
+ address-family ipv4
+  service-policy type pbr FS-BH-GLOBAL
+!
+router bgp 64999
+ address-family ipv4 flowspec
+ neighbor 100.100.81.20
+  address-family ipv4 flowspec

@@ -1,0 +1,31 @@
+! definicja ruchu który poddawać będziemy ograniczeniom jeśli trafi do procesora
+class-map match-any COPP-BGLR-BGP
+ match access-group name COPP-BGLR-BGP-PEERS
+class-map match-any COPP-BGLR-MGMNT
+ match protocol telnet
+ match protocol ssh
+ match protocol scps
+ match protocol ntp
+class-map match-all COPP-BGLR-ICMP
+ match protocol icmp
+! definicja ACL COPP-BGP-BGLR-PEERS która definiuje “zaufanych” sąsiadów na obu routerach
+ip access-list extended COPP-BGLR-ACL
+ permit tcp host 100.91.100.1 host 100.91.100.2
+ permit tcp host 100.95.100.1 host 100.95.100.2
+! zdefiniowanie polityki, która dla wyżej wymienionych kryteriów przytnie dopuszczalne wartości oraz
+! całą resztę ruchu trafiającą do CPU do akceptowalnej wartości - uwaga, dobierz wartości dla swojej sieci!
+policy-map COPP-BGLR-V1
+ class COPP-BGLR-BGP ! pasujący ruch BGP - 15kpps - sprawdź czy routing “zbiega się” odpowiednio szybko po awarii!
+  police rate 15000 pps conform-action transmit exceed-action drop violate-action drop
+ class COPP-BGLR-MGMNT ! ruch z protokołów Telnet/SSH/SCP/NTP - do 50kpps
+  police rate 50000 pps conform-action transmit exceed-action drop violate-action drop
+ class COPP-BGLR-ICMP ! ruch ICMP - 300pps, już wiesz czemu w traceroute widać czasem ‘*’ ;)
+  police rate 300 pps conform-action transmit exceed-action drop violate-action drop
+ class class-default ! dowolny inny ruch - warto na początek sprawdzić dokładnie co tu trafia, mogłeś o czymś zapomnieć!
+  police rate 300 pps
+   conform-action transmit exceed-action drop violate-action drop
+!
+control-plane ! na urządzeniach z Cisco IOS, IOS-XE i NX-OS to logiczny interfejs obsługujący ruch do i z głównego
+              ! procesora urządzenia (Routing Engine); przykłady dla IOS XR i innych systemów znajdziesz w repozytorium 
+ service-policy input COPP-BGLR-V1 ! przypisanie zdefiniowanej polityki dla ruchu wchodzącego
+!

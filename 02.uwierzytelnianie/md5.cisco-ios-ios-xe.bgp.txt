@@ -1,0 +1,7 @@
+! router z AS 64500 – sesja w stronę 64501
+router bgp 64500
+ neighbor 198.51.100.2 password S3CR3T
+
+! router z AS 64501 – sesja w stronę 64500
+router bgp 64501
+ neighbor 198.51.100.1 password S3CR3T

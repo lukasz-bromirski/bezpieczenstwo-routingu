@@ -1,2 +1,5 @@
-# bezpieczenstwo-routingu
-Materiały towarzyszące rozdziałowi "Bezpieczeństwo lokalnego i globalnego routingu"
+# Bezpieczeństwo lokalnego i globalnego routingu
+## Materiały towarzyszące
+
+(c) Łukasz Bromirski, 2022
+

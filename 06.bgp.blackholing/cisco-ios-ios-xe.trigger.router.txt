@@ -1,0 +1,27 @@
+! konfiguracja polityk dla IPv4 i IPv6 pozwalających na redystrybucję z protokołu statycznego
+! prefiksów oznaczonych konkretnym tagiem i ustawiająca odpowiednie atrybuty - w tym next-hop
+route-map BGP-BH-TRIGGER-V4 permit 10
+ match tag 666
+ set origin igp
+ set local-preference 666 ! domyślnie 100, wartość 666 łatwo znaleźć przeglądając zawartość tablic
+ set ip next-hop 192.0.2.1
+ set community 64500:666 no-export
+!
+route-map BGP-BH-TRIGGER-V6 permit 10
+ match tag 666
+ set origin igp
+ set local-preference 666 ! domyślnie 100, wartość 666 łatwo znaleźć przeglądając zawartość tablic
+ set ipv6 next-hop 100::1
+ set community 64500:666 no-export
+!
+
+ip route 192.0.2.0 255.255.255.0 null0 ! pula z RFC 5735 często używana do sygnalizacji w BGP blackholingu
+ip route 192.0.2.1 255.255.255.255 null0 ! najdokładniejszy (/32) wpis dla 192.0.2.1 - do null0
+ipv6 route 100::/64 Null0 ! zgodnie z RFC 6666
+ipv6 route 100::1/128 Null0 ! najdokładniejszy (/128) wpis dla 100::1 - do null0
+
+router bgp 64500
+ address-family ipv4 unicast
+  redistribute static route-map BGP-BH-TRIGGER-V4
+ address-family ipv6 unicast
+  redistribute static route-map BGP-BH-TRIGGER-V6

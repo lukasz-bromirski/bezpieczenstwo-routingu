@@ -1,0 +1,22 @@
+! konfiguracja polityk dla IPv4 i IPv6 pozwalających na redystrybucję z protokołu statycznego
+! prefiksów oznaczonych konkretnym tagiem i ustawiająca odpowiednie atrybuty - w tym next-hop
+route-map BGP-SH-POLICY-V4 permit 10
+ match community 64500:667 ! inne community niż dla blackholingu
+ set origin igp
+ set local-preference 666 ! domyślnie 100, wartość 666 łatwo znaleźć przeglądając zawartość tablic
+ set ip next-hop 100.100.88.254 ! next-hop prowadzi via tunel do stacji zgrywającej ten ruch - można rozważyć zastosowanie
+                                ! wielu adresów dla różnych zastosowań, a nawet dla load-balancingu jeśli to konieczne
+
+ip route 100.100.88.254 255.255.255.255 Tunnel101 ! statyczna trasa kierująca ruch via tunnel101
+
+interface tunnel101
+ description Logiczny tunel dla BGP sinkholingu
+ ip unnumbered loopback 0 ! adres IP z puli przydzielonej do routerów
+ tunnel mode gre ! tryb tunelu - GRE
+ tunnel source lo0 ! tunel zaczyna się z interfejsu logicznego loopback0
+ tunnel destination 100.100.88.254 ! tunel skierowany jest w adres 100.100.88.254 pod którym znajduje się stacja
+                                   ! zgrywająca i np. analizująca ruch
+
+router bgp 64500
+ address-family ipv4 unicast
+  neighbor 100.100.81.20 route-map BGP-SH-POLICY-V4 ! sesja do routera z konfiguracji powyżej
