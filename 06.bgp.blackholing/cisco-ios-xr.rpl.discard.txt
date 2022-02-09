@@ -1,7 +1,0 @@
-route-policy BGP-RTBH
- if community matches-any (64500:666) then
-  set next-hop discard ! prefiks zostanie w tablicy routingu ale z odpowiednio zmodyfikowanym polem next-hop
- else
-  pass
- endif
-end-policy

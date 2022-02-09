@@ -1,9 +1,0 @@
-route-policy BGP-BGLR-RPKI
- if validation-state is invalid then
-  drop
- elseif validation-state is not-found then
-  set local-preference 50
- elseif validation-state is valid then
-  set local-preference 150
- endif
-end-policy

@@ -1,3 +1,0 @@
-! konfiguracja procesu BGP - wskazanie serwera RPKI
-router bgp 65400
- bgp rpki server tcp 100.100.3.179 port 3323 refresh 3600
