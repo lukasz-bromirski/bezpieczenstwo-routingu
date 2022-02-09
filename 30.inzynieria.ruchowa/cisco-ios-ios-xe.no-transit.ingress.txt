@@ -1,0 +1,10 @@
+! alternatywna konfiguracja - nakładanie standardowego community NO-EXPORT, które dla każdej poprawnej implementacji
+! protokołu BGP oznacza, że prefiksu z nim nie można rozgłaszać do innych niż nasz ASów; oczywiście można użyć
+! obu tych zabezpieczeń jednocześnie
+
+route-map BGP-POLICY-INGRESS permit 10 
+ set community no-export                 ! polityka nakłada w/w zdefiniowany filtr 99 na rozgłoszenie do sąsiada 
+
+router bgp 65400
+ neighbor 100.91.100.1 route-map BGP-POLICY-INGRESS in ! polityka dopieta do sasiada
+ neigbhor 100.100.3.88 send-community ! dla niektórych sieciowych OS trzeba wprost aktywować rozgłaszanie community

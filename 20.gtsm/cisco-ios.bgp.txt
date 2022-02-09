@@ -1,0 +1,3 @@
+! konfiguracja procesu BGP - aktywujemy GTSM dla konkretnego sąsiada
+router bgp 65400
+ neighbor 100.91.100.1 ttl-security hops 1

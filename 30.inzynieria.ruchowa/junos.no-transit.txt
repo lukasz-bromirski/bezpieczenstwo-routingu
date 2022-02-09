@@ -1,0 +1,13 @@
+null-as "()";
+policy-statement BGLR-MY-ROUTES {
+  term BGLR-MY-AS {
+    from {
+      protocol bgp;
+      as-path null-as;
+    }
+    then accept;
+  }
+  term EVERYTHING-ELSE {
+    then reject;
+  }
+}

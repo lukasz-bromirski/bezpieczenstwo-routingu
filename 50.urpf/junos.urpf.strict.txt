@@ -1,0 +1,15 @@
+! konfiguracja interfejsu routera w AS 64501 realizującego sesję BGP z AS 64500 (JunOS)
+interfaces {
+ xe-0/1/0 {
+  unit 0 {
+   family inet {
+    address 100.91.100.1/30;
+    rpf-check;
+   }
+   family inet6 {
+    address 2001:db8:501:100::1/126;
+    rpf-check;
+   }
+  }
+ }
+}

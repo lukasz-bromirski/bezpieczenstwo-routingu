@@ -1,0 +1,10 @@
+! konfiguracja dla rozgłaszania - tylko pusta ścieżka AS_PATH (filtr analizowany jest zanim do rozgłaszanego
+! prefiksu dołączony zostanie nasz ASN
+
+ip as-path access-list 99 permit ^$ ! AS-PATH lista pasuje tylko do pustej ścieżki AS_PATH
+
+route-map BGP-POLICY-EGRESS permit 10 
+ filter-list 1 out                 ! polityka nakłada w/w zdefiniowany filtr 99 na rozgłoszenie do sąsiada 
+
+router bgp 65400
+ neighbor 100.91.100.1 route-map BGP-POLICY-EGRESS out ! polityka dopieta do sasiada
